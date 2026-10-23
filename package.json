@@ -1,6 +1,6 @@
 {
   "name": "dsh-rtk-rewrite",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "DeepSeek Harness profile plugin that rewrites shell commands through RTK (Rust Token Killer) before they run.",
   "type": "module",
   "main": "index.js",
