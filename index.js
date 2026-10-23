@@ -72,7 +72,10 @@ export function apply(ctx, config = {}) {
       ) {
         const rewritten = await rewrite(args.command)
         // bash cannot execute a .cmd launcher, so it gets the real binary.
-        const routed = rewritten === '' ? '' : routeThroughRtk(rewritten, exec.name === 'bash' ? rtkPath : commandPath)
+        const routed =
+          rewritten === ''
+            ? ''
+            : routeThroughRtk(rewritten, exec.name === 'bash' ? rtkPath : commandPath, exec.name)
         if (routed !== '' && routed !== args.command && isRtkCommand(rewritten) && !rewritten.includes('\n')) {
           exec.arguments = { ...args, command: routed }
         }

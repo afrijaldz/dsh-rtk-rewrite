@@ -94,13 +94,21 @@ test('rewriter is a no-op without a resolved binary', async () => {
 test('routeThroughRtk names the executable so rtk need not be on PATH', () => {
   assert.equal(
     routeThroughRtk('rtk git status', 'C:\\Program Files\\rtk\\rtk.exe'),
-    '"C:/Program Files/rtk/rtk.exe" git status',
+    '& "C:/Program Files/rtk/rtk.exe" git status',
   )
-  assert.equal(routeThroughRtk('rtk cargo test --all', 'C:\\rtk\\rtk.exe'), '"C:/rtk/rtk.exe" cargo test --all')
+  assert.equal(
+    routeThroughRtk('rtk cargo test --all', 'C:\\rtk\\rtk.exe'),
+    '& "C:/rtk/rtk.exe" cargo test --all',
+  )
+})
+
+test('routeThroughRtk omits the call operator for bash, which would background it', () => {
+  assert.equal(routeThroughRtk('rtk git status', 'C:\\rtk\\rtk.exe', 'bash'), '"C:/rtk/rtk.exe" git status')
+  assert.equal(routeThroughRtk('rtk git status', 'C:\\rtk\\rtk.exe', 'pwsh'), '& "C:/rtk/rtk.exe" git status')
 })
 
 test('routeThroughRtk only rewrites a leading rtk token', () => {
-  assert.equal(routeThroughRtk('rtk.exe git diff rtk', 'C:\\rtk\\rtk.cmd'), '"C:/rtk/rtk.cmd" git diff rtk')
+  assert.equal(routeThroughRtk('rtk.exe git diff rtk', 'C:\\rtk\\rtk.cmd'), '& "C:/rtk/rtk.cmd" git diff rtk')
   assert.equal(routeThroughRtk('rtkish git status', 'C:\\rtk\\rtk.exe'), 'rtkish git status')
   assert.equal(routeThroughRtk('git status', 'C:\\rtk\\rtk.exe'), 'git status')
 })

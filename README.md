@@ -86,10 +86,12 @@ Override the row's `config` in your profile's `cordis.patch.yml`:
 stores state in `%LOCALAPPDATA%\rtk` on Windows, which such a sandbox denies.
 
 `rtkPath` alone is enough to run rewrites: the emitted command names that executable instead of
-bare `rtk`, so RTK does not have to be on `PATH`. Set `commandPath` when the command the shell runs
-should be a wrapper rather than the binary — for example a launcher that points RTK's state at a
-writable directory, in which case the binary itself still comes from `rtkPath` (wrappers written as
-`.cmd` cannot be spawned with piped stdio).
+bare `rtk`, so RTK does not have to be on `PATH`. PowerShell gets the call operator
+(`& "C:/tools/rtk/rtk.exe" git status`), because a quoted path at the start of a command is a parse
+error there; bash gets the bare quoted path, since `&` would background it. Set `commandPath` when
+the command the shell runs should be a wrapper rather than the binary — for example a launcher that
+points RTK's state at a writable directory, in which case the binary itself still comes from
+`rtkPath` (wrappers written as `.cmd` cannot be spawned with piped stdio).
 
 ## Windows notes
 
