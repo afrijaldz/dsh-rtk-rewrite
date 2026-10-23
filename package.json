@@ -1,0 +1,48 @@
+{
+  "name": "dsh-rtk-rewrite",
+  "version": "0.1.0",
+  "description": "DeepSeek Harness profile plugin that rewrites shell commands through RTK (Rust Token Killer) before they run.",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./icon": "./icon.svg",
+    "./locale/*.json": "./locale/*.json"
+  },
+  "files": [
+    "index.js",
+    "lib",
+    "cordis.patch.yml",
+    "locale",
+    "icon.svg",
+    "README.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "scripts": {
+    "test": "node --test test/policy.test.mjs test/rtk.test.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/afrijaldz/dsh-rtk-rewrite.git"
+  },
+  "homepage": "https://github.com/afrijaldz/dsh-rtk-rewrite#readme",
+  "bugs": {
+    "url": "https://github.com/afrijaldz/dsh-rtk-rewrite/issues"
+  },
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "rtk",
+    "tokens",
+    "plugin"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  }
+}

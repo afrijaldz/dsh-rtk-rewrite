@@ -1,0 +1,5 @@
+- insert:
+    - id: rtk-rewrite
+      name: dsh-rtk-rewrite
+      config:
+        enabled: true

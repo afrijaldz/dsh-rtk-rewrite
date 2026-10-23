@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "RTK Rewrite",
+    "description": "Routes supported shell commands through RTK (Rust Token Killer) so their output reaches the model compressed."
+  }
+}
