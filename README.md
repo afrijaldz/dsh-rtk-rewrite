@@ -1,5 +1,7 @@
 # dsh-rtk-rewrite
 
+[![CI](https://github.com/afrijaldz/dsh-rtk-rewrite/actions/workflows/ci.yml/badge.svg)](https://github.com/afrijaldz/dsh-rtk-rewrite/actions/workflows/ci.yml)
+
 A DeepSeek Harness profile plugin that routes supported shell commands through
 [RTK (Rust Token Killer)](https://github.com/rtk-ai/rtk) before they run, so their output reaches
 the model compressed.
