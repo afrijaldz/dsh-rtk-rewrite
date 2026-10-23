@@ -3,7 +3,7 @@ import { mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import test from 'node:test'
-import { createRewriter, resolveRtkPath, rtkEnvironment } from '../lib/rtk.js'
+import { createRewriter, resolveRtkPath, routeThroughRtk, rtkEnvironment } from '../lib/rtk.js'
 
 function fakeExecFile(behaviour, calls) {
   return (file, args, options, callback) => {
@@ -89,4 +89,23 @@ test('rewriter is a no-op without a resolved binary', async () => {
   })
   assert.equal(await rewrite('git status'), '')
   assert.equal(calls.length, 0)
+})
+
+test('routeThroughRtk names the executable so rtk need not be on PATH', () => {
+  assert.equal(
+    routeThroughRtk('rtk git status', 'C:\\Program Files\\rtk\\rtk.exe'),
+    '"C:/Program Files/rtk/rtk.exe" git status',
+  )
+  assert.equal(routeThroughRtk('rtk cargo test --all', 'C:\\rtk\\rtk.exe'), '"C:/rtk/rtk.exe" cargo test --all')
+})
+
+test('routeThroughRtk only rewrites a leading rtk token', () => {
+  assert.equal(routeThroughRtk('rtk.exe git diff rtk', 'C:\\rtk\\rtk.cmd'), '"C:/rtk/rtk.cmd" git diff rtk')
+  assert.equal(routeThroughRtk('rtkish git status', 'C:\\rtk\\rtk.exe'), 'rtkish git status')
+  assert.equal(routeThroughRtk('git status', 'C:\\rtk\\rtk.exe'), 'git status')
+})
+
+test('routeThroughRtk is a no-op without an executable', () => {
+  assert.equal(routeThroughRtk('rtk git status', undefined), 'rtk git status')
+  assert.equal(routeThroughRtk('rtk git status', ''), 'rtk git status')
 })

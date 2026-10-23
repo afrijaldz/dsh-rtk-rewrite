@@ -75,6 +75,7 @@ Override the row's `config` in your profile's `cordis.patch.yml`:
 |---|---|---|
 | `enabled` | `true` | Set `false` to disable without uninstalling |
 | `rtkPath` | auto | Explicit path to the `rtk` executable |
+| `commandPath` | `rtkPath` | Executable the rewritten command names, when that differs from `rtkPath` (e.g. a launcher that redirects RTK's state directory) |
 | `dataDir` | RTK default | Keep RTK's database, config, recall and tee files under this directory |
 | `timeoutMs` | `1500` | Per-rewrite time limit; timeouts pass the command through |
 | `cacheSize` | `500` | Remembered rewrites before the cache resets |
@@ -83,6 +84,12 @@ Override the row's `config` in your profile's `cordis.patch.yml`:
 
 `dataDir` matters inside sandboxes that only permit writes under one directory: RTK otherwise
 stores state in `%LOCALAPPDATA%\rtk` on Windows, which such a sandbox denies.
+
+`rtkPath` alone is enough to run rewrites: the emitted command names that executable instead of
+bare `rtk`, so RTK does not have to be on `PATH`. Set `commandPath` when the command the shell runs
+should be a wrapper rather than the binary — for example a launcher that points RTK's state at a
+writable directory, in which case the binary itself still comes from `rtkPath` (wrappers written as
+`.cmd` cannot be spawned with piped stdio).
 
 ## Windows notes
 

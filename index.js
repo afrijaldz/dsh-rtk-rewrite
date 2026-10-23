@@ -1,5 +1,6 @@
+import { existsSync } from 'node:fs'
 import { DEFAULT_COMMANDS, isRtkCommand, shouldRewrite } from './lib/policy.js'
-import { createRewriter, resolveRtkPath } from './lib/rtk.js'
+import { createRewriter, resolveRtkPath, routeThroughRtk } from './lib/rtk.js'
 
 /**
  * Cordis plugin name, used by loader diagnostics.
@@ -23,6 +24,8 @@ export const inject = ['tools']
  * @param {object} [config]
  * @param {boolean} [config.enabled] - set false to disable without uninstalling
  * @param {string} [config.rtkPath] - explicit path to the rtk executable
+ * @param {string} [config.commandPath] - executable the emitted command names, when that
+ *   differs from `rtkPath` (e.g. a launcher that redirects RTK's state directory)
  * @param {string} [config.dataDir] - keep RTK state (db, config, tee) under this directory
  * @param {number} [config.timeoutMs] - per-rewrite limit, default 1500
  * @param {number} [config.cacheSize] - remembered rewrites, default 500
@@ -45,6 +48,13 @@ export function apply(ctx, config = {}) {
     cacheSize: positive(config.cacheSize, 500),
   })
 
+  // What the shell should invoke. Defaults to the resolved binary, so a
+  // configured `rtkPath` works without `rtk` ever being on PATH.
+  const commandPath =
+    typeof config.commandPath === 'string' && config.commandPath !== '' && existsSync(config.commandPath)
+      ? config.commandPath
+      : rtkPath
+
   const allowed = new Set([...DEFAULT_COMMANDS, ...(config.commands ?? [])].map(lower))
   const blocked = new Set((config.exclude ?? []).map(lower))
 
@@ -61,8 +71,10 @@ export function apply(ctx, config = {}) {
         shouldRewrite(args.command, { allowed, blocked })
       ) {
         const rewritten = await rewrite(args.command)
-        if (rewritten !== '' && rewritten !== args.command && isRtkCommand(rewritten) && !rewritten.includes('\n')) {
-          exec.arguments = { ...args, command: rewritten }
+        // bash cannot execute a .cmd launcher, so it gets the real binary.
+        const routed = rewritten === '' ? '' : routeThroughRtk(rewritten, exec.name === 'bash' ? rtkPath : commandPath)
+        if (routed !== '' && routed !== args.command && isRtkCommand(rewritten) && !rewritten.includes('\n')) {
+          exec.arguments = { ...args, command: routed }
         }
       }
     } catch {
